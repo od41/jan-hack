@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Sign Message</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.2.0/ethers.umd.min.js"
+        type="application/javascript"></script>
+</head>
+
+<body>
+    <button onclick="connectAndSign()">Connect Wallet & Sign</button>
+    <pre id="output"></pre>
+
+    <script>
+        async function connectAndSign() {
+            try {
+                // Connect to MetaMask
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                const signer = provider.getSigner();
+                const address = await signer.getAddress();
+
+                // Message to sign
+                const message = "Login to Move&Earn";
+
+                // Get signature
+                const signature = await signer.signMessage(message);
+
+                // Display results
+                const output = {
+                    wallet_address: address,
+                    message: message,
+                    signature: signature
+                };
+
+                document.getElementById('output').textContent =
+                    JSON.stringify(output, null, 2);
+            } catch (err) {
+                console.error(err);
+                document.getElementById('output').textContent =
+                    'Error: ' + err.message;
+            }
+        }
+    </script>
+</body>
+
+</html>
