@@ -2,13 +2,7 @@ import { Router, Request, Response } from 'express';
 import { ethers } from 'ethers';
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
-
-
-interface AuthRequest extends Request {
-      wallet_address: string;
-      signature: string;
-      message: string;
-  }
+import {AuthRequest} from '../middleware/authMiddleware'
 
 
 const router = Router();
