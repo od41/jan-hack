@@ -4,6 +4,8 @@ import "@nomicfoundation/hardhat-chai-matchers";
 import "@nomicfoundation/hardhat-toolbox";
 import "@nomiclabs/hardhat-solhint";
 
+import "@nomicfoundation/hardhat-toolbox";
+
 import { HardhatUserConfig } from "hardhat/config";
 
 const config: HardhatUserConfig = {
