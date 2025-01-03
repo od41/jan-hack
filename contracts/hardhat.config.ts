@@ -30,6 +30,10 @@ const config: HardhatUserConfig = {
       loggingEnabled: true,
     },
   },
+  paths: {
+    cache: "./cache",
+    artifacts: "./artifacts",
+  },
 };
 
 export default config;
