@@ -65,8 +65,13 @@ router.get('/:poolId', async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Pool not found' });
     }
 
+    const today = new Date();
+    const endDate = new Date(pool.metadata.end_date);
+
+    const hasEndDatePassed = today > endDate;
+
     // Check if pool should be marked as completed
-    if (pool.status !== 'completed' && new Date() > new Date(pool.metadata.end_date)) {
+    if (pool.status !== 'completed' && hasEndDatePassed) {
       pool.status = 'completed';
       await pool.save();
     }
