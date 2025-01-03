@@ -7,7 +7,7 @@ import protect from './middleware/authMiddleware';
 // Import routes
 import userRoutes from './routes/userRoutes';
 import sessionRoutes from './routes/sessionRoutes';
-// import poolRoutes from './routes/poolRoutes';
+import poolRoutes from './routes/poolRoutes';
 // import proofRoutes from './routes/proofRoutes';
 
 dotenv.config();
@@ -29,8 +29,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/users', userRoutes);
     
 // Protected routes
+// @ts-ignore
 app.use('/api/sessions', protect, sessionRoutes);
-// app.use('/api/pools', authMiddleware, poolRoutes);
+// @ts-ignore
+app.use('/api/pools', protect, poolRoutes);
 // app.use('/api/proofs', authMiddleware, proofRoutes);
 
 mongoose
