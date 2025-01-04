@@ -3,13 +3,21 @@ import { ethers } from 'ethers';
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
 import {AuthRequest} from '../middleware/authMiddleware'
+import { randomBytes } from 'crypto';
 
 
 const router = Router();
 
+// @ts-ignore
+router.get('/nonce', async(req:Request, res:Response) => {
+  const nonce = randomBytes(12).toString('hex');
+  return res.json({ nonce });
+})
+
 router.post('/login', async (req: AuthRequest, res: any) => {
   try {
     const { signature, message, wallet_address } = req.body;
+    
     
     // Verify signature
     const signerAddr = ethers.verifyMessage(message, signature);

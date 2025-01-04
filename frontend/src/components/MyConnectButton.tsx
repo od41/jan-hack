@@ -1,6 +1,8 @@
 import { ConnectKitButton } from "connectkit";
+import { useApp } from "../contexts/AppProvider";
 
 export const MyConnectButton = () => {
+    const {login} = useApp()
   return (
     <ConnectKitButton.Custom>
       {({ isConnected, show, address, chain }) => {

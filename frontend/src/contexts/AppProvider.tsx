@@ -1,11 +1,14 @@
 import React, { createContext, useContext, useState } from 'react';
+import { useAccount, useSignMessage } from 'wagmi';
+
+const BASE_BACKEND_URL =  import.meta.env.VITE_BACKEND_BASE_URL!;
 
 // Define the context type
 interface AppContextType {
     user: any; // Replace 'any' with your user type
     isLoggedIn: boolean;
     register: (userData: any) => Promise<void>; // Replace 'any' with your user data type
-    login: (credentials: any) => Promise<void>; // Replace 'any' with your credentials type
+    login: () => Promise<void>; // Replace 'any' with your credentials type
     startPool: () => void;
     joinPool: (poolId: string) => void;
     startSession: () => void;
@@ -22,12 +25,48 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const [user, setUser] = useState<any>(null); // Replace 'any' with your user type
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
+    const { signMessage } = useSignMessage()
+    const { address: walletAddress }  = useAccount()
+
+
     const register = async (userData: any) => {
         // Implement registration logic
     };
 
-    const login = async (credentials: any) => {
-        // Implement login logic
+    const login = async () => {
+        const message = "Welcome to FitFi";
+
+        // Sign the message (this is a placeholder, replace with actual signing logic)
+        const signature = await signMessage({
+            account:walletAddress, 
+            message
+        });
+
+        try {
+            // Send the wallet address and signature to the backend
+        const response = await fetch(`${BASE_BACKEND_URL}/api/users/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                wallet_address: walletAddress, 
+                signature,
+                message
+             }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            setUser(data.user); // Assuming the response contains user data
+            setIsLoggedIn(true);
+        }
+            
+        } catch (error) {
+            console.log(error)
+        }
+
+        
     };
 
     const startPool = () => {
