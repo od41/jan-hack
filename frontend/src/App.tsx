@@ -1,18 +1,18 @@
 import { MainLayout } from './components/Layout/MainLayout';
 import { ActivityTracker } from './components/Activity/ActivityTracker';
 import { RewardsDisplay } from './components/Rewards/RewardsDisplay';
-import { Web3Provider } from './contexts/Web3Provider';
+import { CombinedProvider } from './contexts/CombinedProvider';
 
 function App() {
   return (
-    <Web3Provider>
+    <CombinedProvider>
       <MainLayout>
         <div className="space-y-8">
           <ActivityTracker />
           <RewardsDisplay />
         </div>
       </MainLayout>
-    </Web3Provider>
+    </CombinedProvider>
   );
 }
 
