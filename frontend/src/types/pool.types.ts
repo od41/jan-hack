@@ -1,7 +1,5 @@
-export interface Pool {
-    id: string;
-    name: string;
-    entryFee: string;
-    totalParticipants: number;
-    currentParticipants: number;
+export interface PoolJoinRequest {
+    poolId: string;
+    userAddress: string;
+    amount: string;
   }
