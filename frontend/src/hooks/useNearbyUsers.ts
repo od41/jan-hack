@@ -1,23 +1,22 @@
 import { useState, useEffect } from 'react';
-import type { UserLocation, NearbyUser } from '../types/location.types';
 import { calculateDistance } from '../utils/location.utils';
+import type { Location, UserLocation, NearbyUser } from '../types/location.types';
 
+// Change the parameter type to Location since that's what useLocation returns
 export const useNearbyUsers = (currentLocation: Location | null) => {
   const [nearbyUsers, setNearbyUsers] = useState<NearbyUser[]>([]);
 
   useEffect(() => {
     if (!currentLocation) return;
 
-    // In a real app, this would be a WebSocket or regular API call
     const fetchNearbyUsers = async () => {
       try {
-        // Simulated API call
         const response = await fetch('/api/nearby-users', {
           method: 'POST',
           body: JSON.stringify(currentLocation),
         });
         const users: UserLocation[] = await response.json();
-        
+
         const nearby = users.map(user => ({
           userId: user.userId,
           userName: user.userName,
@@ -40,7 +39,8 @@ export const useNearbyUsers = (currentLocation: Location | null) => {
       }
     };
 
-    const interval = setInterval(fetchNearbyUsers, 30000); // Update every 30 seconds
+    const interval = setInterval(fetchNearbyUsers, 30000);
+    fetchNearbyUsers(); // Initial fetch
 
     return () => clearInterval(interval);
   }, [currentLocation]);
