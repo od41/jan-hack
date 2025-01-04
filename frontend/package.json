@@ -10,12 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.62.15",
     "@web3-react/core": "^6.1.9",
     "@web3-react/injected-connector": "^6.0.7",
+    "connectkit": "^1.8.2",
     "ethers": "^5.7.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "tailwindcss": "^3.4.17"
+    "tailwindcss": "^3.4.17",
+    "viem": "^2.22.2",
+    "wagmi": "^2.14.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

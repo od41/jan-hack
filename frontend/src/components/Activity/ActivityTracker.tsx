@@ -53,6 +53,10 @@ export const ActivityTracker: React.FC = () => {
         {isTracking && (
           <div className="mt-4">
             <p>GPS Data Points: {currentActivity.gpsData?.length || 0}</p>
+            <p>logs: {currentActivity.gpsData?.map((gps: any, index: number) => <div key={`index+${index}`}>
+              coord: {gps.latitude} / {gps.longitude}
+              timestamp: {gps.timestamp}
+            </div>)}</p>
             {/* Add map visualization here */}
           </div>
         )}

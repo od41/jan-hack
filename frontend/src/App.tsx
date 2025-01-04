@@ -1,18 +1,18 @@
-import { WalletProvider } from './contexts/WalletContext';
 import { MainLayout } from './components/Layout/MainLayout';
 import { ActivityTracker } from './components/Activity/ActivityTracker';
 import { RewardsDisplay } from './components/Rewards/RewardsDisplay';
+import { Web3Provider } from './contexts/Web3Provider';
 
 function App() {
   return (
-    <WalletProvider>
+    <Web3Provider>
       <MainLayout>
         <div className="space-y-8">
           <ActivityTracker />
           <RewardsDisplay />
         </div>
       </MainLayout>
-    </WalletProvider>
+    </Web3Provider>
   );
 }
 
