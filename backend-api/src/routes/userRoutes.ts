@@ -2,17 +2,68 @@ import { Router, Request, Response } from 'express';
 import { ethers } from 'ethers';
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
-import {AuthRequest} from '../middleware/authMiddleware'
-import { randomBytes } from 'crypto';
-
+import {AuthRequest} from '../middleware/authMiddleware';
+import { generateNonce, SiweMessage } from 'siwe';
 
 const router = Router();
 
 // @ts-ignore
 router.get('/nonce', async(req:Request, res:Response) => {
-  const nonce = randomBytes(12).toString('hex');
-  return res.json({ nonce });
+  const nonce = generateNonce();
+  res.setHeader('Content-Type', 'text/plain');
+  return res.send(nonce);
 })
+
+router.post('/verify', async (req: AuthRequest, res: any) => {
+  const { message, signature } = req.body;
+    const siweMessage = new SiweMessage(message);
+    try {
+        const siwe = await siweMessage.verify({ signature });
+        if (siwe.success) {
+          // @ts-ignore
+          req.session.siwe = siwe;
+          await req.session.save()
+          console.log('sess', req.session, req.session.siwe)
+          return res.json({ok: true});
+        } else {
+          return res.send(false)
+        }
+    } catch {
+        return res.send(false);
+    }
+});
+
+
+
+router.get('/session', async (req: AuthRequest, res: any) => {
+  console.log('sess get', req.session, req.session.siwe)
+
+  // @ts-ignore
+  if (!req.session.siwe) {
+    return res.status(404).send(` user not found`);
+  } else {
+  // @ts-ignore
+    const walletAddress = req.session.siwe.data.address
+  // @ts-ignore
+    const chainId = req.session.siwe.data.chainId
+    // Find or create user
+    let user = await User.findOne({ wallet_address: walletAddress });
+    if(!user) {
+      user = await User.create({
+        wallet_address: walletAddress,
+        username: walletAddress
+      });
+    }
+    // Generate JWT
+    const token = jwt.sign(
+      { wallet_address: user.wallet_address },
+      process.env.JWT_SECRET!,
+      { expiresIn: '24h' }
+    );
+
+    return res.status(200).json({user, token, ok: true, address: walletAddress, chainId});
+  }
+});
 
 router.post('/login', async (req: AuthRequest, res: any) => {
   try {

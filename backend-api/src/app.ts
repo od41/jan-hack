@@ -3,6 +3,7 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import protect from './middleware/authMiddleware';
+import Session from 'express-session';
 
 // Import routes
 import userRoutes from './routes/userRoutes';
@@ -24,6 +25,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(Session({
+  name: 'siwe-quickstart',
+  secret: "siwe-quickstart-secret",
+  resave: true,
+  saveUninitialized: true,
+  cookie: { secure: false, sameSite: "lax" }
+}));
 
 // Public routes
 app.use('/api/users', userRoutes);

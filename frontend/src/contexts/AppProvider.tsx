@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState } from 'react';
 import { useAccount, useSignMessage } from 'wagmi';
 
-const BASE_BACKEND_URL =  import.meta.env.VITE_BACKEND_BASE_URL!;
+export const BASE_BACKEND_URL =  import.meta.env.VITE_BACKEND_BASE_URL!;
 
 // Define the context type
 interface AppContextType {

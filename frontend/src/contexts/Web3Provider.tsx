@@ -2,9 +2,12 @@ import React from 'react';
 
 import { WagmiProvider, createConfig, http } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ConnectKitProvider, getDefaultConfig } from 'connectkit';
+import { SIWEProvider, SIWEConfig, ConnectKitProvider, getDefaultConfig } from 'connectkit';
+import { SiweMessage } from 'siwe';
 
-import { Chain, zksyncSepoliaTestnet } from "wagmi/chains";
+import { BASE_BACKEND_URL } from './AppProvider';
+
+import { Chain } from "wagmi/chains";
 
 export const lensTestnet: Chain = {
   id: 37111,
@@ -29,18 +32,47 @@ const config = createConfig(
     walletConnectProjectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID!,
     chains: [lensTestnet],
     transports: {
-      [zksyncSepoliaTestnet.id]: http(zksyncSepoliaTestnet.rpcUrls.default.http[0])
+      [lensTestnet.id]: http(lensTestnet.rpcUrls.default.http[0])
     }
   })
 );
 
 const queryClient = new QueryClient();
 
+const siweConfig: SIWEConfig = {
+  getNonce: async () => fetch(`${BASE_BACKEND_URL}/api/users/nonce`).then((res) => res.text()),
+
+  createMessage: ({ nonce, address, chainId }) => new SiweMessage({
+    version: '1',
+    domain: window.location.host,
+    uri: window.location.origin,
+    address,
+    chainId,
+    nonce,
+    statement: 'Sign in to FitFi.',
+  }).prepareMessage(),
+  
+  verifyMessage: async ({ message, signature }) => fetch(`${BASE_BACKEND_URL}/api/users/verify`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ message, signature }),
+  }).then((res) => res.ok),
+
+  getSession: async () => fetch(`${BASE_BACKEND_URL}/api/users/session`).then((res) => res.ok ? res.json() : null),
+
+  signOut: async () => fetch(`${BASE_BACKEND_URL}/api/users/logout`).then((res) => res.ok),
+  
+};
+
 export const Web3Provider = ({ children }: { children: React.ReactNode }) => {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <ConnectKitProvider debugMode>{children}</ConnectKitProvider>
+        <SIWEProvider {...siweConfig}>
+          <ConnectKitProvider debugMode>{children}</ConnectKitProvider>
+        </SIWEProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );
