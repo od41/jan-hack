@@ -16,15 +16,32 @@ router.get('/nonce', async(req:Request, res:Response) => {
 
 router.post('/verify', async (req: AuthRequest, res: any) => {
   const { message, signature } = req.body;
-    const siweMessage = new SiweMessage(message);
-    try {
+  const siweMessage = new SiweMessage(message);
+  try {
         const siwe = await siweMessage.verify({ signature });
         if (siwe.success) {
-          // @ts-ignore
-          req.session.siwe = siwe;
+          req.session.siwe = siwe
           await req.session.save()
-          console.log('sess', req.session, req.session.siwe)
-          return res.json({ok: true});
+         // @ts-ignore
+    const walletAddress = siwe.data.address
+    // @ts-ignore
+      const chainId = siwe.data.chainId
+      // Find or create user
+      let user = await User.findOne({ wallet_address: walletAddress });
+      if(!user) {
+        user = await User.create({
+          wallet_address: walletAddress,
+          username: walletAddress
+        });
+      }
+      // Generate JWT
+      const token = jwt.sign(
+        { wallet_address: user.wallet_address },
+        process.env.JWT_SECRET!,
+        { expiresIn: '24h' }
+      );
+  
+      return res.status(200).json({user, token, ok: true, address: walletAddress, chainId});
         } else {
           return res.send(false)
         }

@@ -59,7 +59,7 @@ const siweConfig: SIWEConfig = {
     },
     body: JSON.stringify({ message, signature }),
   }).then((res) => res.ok),
-
+  
   getSession: async () => fetch(`${BASE_BACKEND_URL}/api/users/session`).then((res) => res.ok ? res.json() : null),
 
   signOut: async () => fetch(`${BASE_BACKEND_URL}/api/users/logout`).then((res) => res.ok),

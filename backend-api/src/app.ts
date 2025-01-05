@@ -22,14 +22,17 @@ if (!MONGODB_URI) {
 
 const app = express();
 
-app.use(cors());
 app.use(express.json());
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true,
+}));
 app.use(express.urlencoded({ extended: true }));
 app.use(Session({
   name: 'siwe-quickstart',
   secret: "siwe-quickstart-secret",
   resave: true,
-  saveUninitialized: true,
+  saveUninitialized: false,
   cookie: { secure: false, sameSite: "lax" }
 }));
 

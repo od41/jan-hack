@@ -11,10 +11,9 @@ export const MyConnectButton = () => {
     const handleSignIn = async () => {
         console.log('data', data)
 
-      await signIn()?.then((session?: SIWESession) => {
-        // Do something when signed in
-        console.log(session)
-      });
+      const res = await signIn()
+
+      console.info('resykt', res)
     };
   
     const handleSignOut = async () => {
