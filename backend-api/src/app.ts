@@ -8,8 +8,8 @@ import MongoStore from 'connect-mongo';
 
 // Import routes
 import userRoutes from './routes/userRoutes';
-import sessionRoutes from './routes/sessionRoutes';
-import poolRoutes from './routes/poolRoutes';
+import activityRoutes from './routes/activityRoutes';
+import groupRoutes from './routes/groupRoutes';
 // import proofRoutes from './routes/proofRoutes';
 
 dotenv.config();
@@ -53,9 +53,9 @@ app.use('/api/users', userRoutes);
     
 // Protected routes
 // @ts-ignore
-app.use('/api/sessions', protect, sessionRoutes);
+app.use('/api/activity', protect, activityRoutes);
 // @ts-ignore
-app.use('/api/pools', protect, poolRoutes);
+app.use('/api/groups', protect, groupRoutes);
 // app.use('/api/proofs', authMiddleware, proofRoutes);
 
 mongoose

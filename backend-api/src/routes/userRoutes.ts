@@ -74,6 +74,7 @@ router.get('/session', async (req: AuthRequest, res: any) => {
 });
 
 router.get('/logout', async (req: AuthRequest, res: any) => {
+  // @ts-ignore
   req.session.destroy();
   return res.status(200).json({ ok: true });
 });

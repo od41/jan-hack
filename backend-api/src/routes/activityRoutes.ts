@@ -1,6 +1,6 @@
 import { Router, Response, Request } from 'express';
 import { AuthRequest } from '../middleware/authMiddleware';
-import GameSession from '../models/GameSession';
+import GameSession from '../models/ActivitySession';
 import { calculateDistance, generateProofHash, validateMovement } from '../utils/movementUtils';
 
 const router = Router();

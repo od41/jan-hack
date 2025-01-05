@@ -1,8 +1,8 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-export interface IGameSession extends Document {
+export interface IActivitySession extends Document {
   user_id: string;
-  pool_id: string;
+  group_id: string;
   start_time: Date;
   end_time?: Date;
   activity_status: 'active' | 'completed' | 'cancelled';
@@ -18,12 +18,12 @@ export interface IGameSession extends Document {
   proof_hash?: string;
 }
 
-const GameSessionSchema = new Schema({
+const ActivitySessionSchema = new Schema({
   user_id: {
     type: String,
     required: true,
   },
-  pool_id: {
+  group_id: {
     type: String,
     required: true,
   },
@@ -56,4 +56,4 @@ const GameSessionSchema = new Schema({
   proof_hash: String,
 });
 
-export default mongoose.model<IGameSession>('GameSession', GameSessionSchema); 
+export default mongoose.model<IActivitySession>('ActivitySession', ActivitySessionSchema); 

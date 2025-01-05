@@ -11,6 +11,8 @@ interface CreateGroupForm {
 
 const CreateGroup: React.FC = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState<CreateGroupForm>({
     name: '',
     description: '',
@@ -19,14 +21,94 @@ const CreateGroup: React.FC = () => {
     frequency: 'daily'
   });
 
+  const validateForm = () => {
+    if (form.name.length < 3) {
+      setError('Group name must be at least 3 characters long');
+      return false;
+    }
+    if (form.description.length < 10) {
+      setError('Description must be at least 10 characters long');
+      return false;
+    }
+    if (parseFloat(form.minStake) <= 0) {
+      setError('Minimum stake must be greater than 0');
+      return false;
+    }
+    if (form.maxMembers < 2 || form.maxMembers > 100) {
+      setError('Number of members must be between 2 and 100');
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Add contract interaction here
-    navigate('/groups');
+    setError(null);
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch('/api/groups/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          pool_id: crypto.randomUUID(), // Generate unique ID
+          metadata: {
+            name: form.name,
+            description: form.description,
+            start_date: new Date(),
+            end_date: calculateEndDate(form.frequency),
+          },
+          rules: {
+            min_stake: parseFloat(form.minStake),
+            max_members: form.maxMembers,
+            frequency: form.frequency,
+          }
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || 'Failed to create group');
+      }
+
+      navigate('/groups');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create group');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const calculateEndDate = (frequency: string) => {
+    const date = new Date();
+    switch (frequency) {
+      case 'daily':
+        date.setDate(date.getDate() + 1);
+        break;
+      case 'weekly':
+        date.setDate(date.getDate() + 7);
+        break;
+      case 'monthly':
+        date.setMonth(date.getMonth() + 1);
+        break;
+    }
+    return date;
   };
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
+      {error && (
+        <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+          {error}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label className="block text-sm font-medium text-gray-700">Group Name</label>
@@ -88,9 +170,19 @@ const CreateGroup: React.FC = () => {
 
         <button
           type="submit"
-          className="w-full bg-purple-600 text-white py-3 rounded-full font-semibold"
+          disabled={loading}
+          className={`w-full ${
+            loading ? 'bg-purple-400' : 'bg-purple-600'
+          } text-white py-3 rounded-full font-semibold flex items-center justify-center`}
         >
-          Create Group
+          {loading ? (
+            <>
+              <span className="mr-2">Creating...</span>
+              <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
+            </>
+          ) : (
+            'Create Group'
+          )}
         </button>
       </form>
     </div>

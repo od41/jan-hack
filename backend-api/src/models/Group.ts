@@ -1,25 +1,24 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-export interface IPool extends Document {
-  pool_id: string;        // Maps to on-chain pool ID
+export interface IGroup extends Document {
+  group_id: string;        // Maps to on-chain pool ID
   metadata: {
     name: string;
     description: string;
     created_at: Date;
-    start_date: Date;
-    end_date: Date;
-    duration: number;     // in days
   };
   rules: {
+    min_stake: number;
+    max_number: number;
+    frequency: 'daily' | 'weekly' | 'monthly';  // tracking frequency
     min_distance: number; // in km
     min_steps: number;
-    frequency: 'daily' | 'weekly' | 'monthly';  // tracking frequency
   };
   status: 'pending' | 'active' | 'completed';
 }
 
-const PoolSchema = new Schema({
-  pool_id: {
+const GroupSchema = new Schema({
+  group_id: {
     type: String,
     required: true,
     unique: true
@@ -36,21 +35,22 @@ const PoolSchema = new Schema({
     created_at: {
       type: Date,
       default: Date.now
-    },
-    start_date: {
-      type: Date,
-      required: true
-    },
-    end_date: {
-      type: Date,
-      required: true
-    },
-    duration: {
-      type: Number,
-      required: true
     }
   },
   rules: {
+    min_stake: {
+      type: Number,
+      required: true
+    },
+    max_members: {
+      type: Number,
+      required: true
+    },
+    frequency: {
+      type: String,
+      enum: ['daily', 'weekly', 'monthly'],
+      required: true
+    },
     min_distance: {
       type: Number,
       required: true
@@ -59,11 +59,8 @@ const PoolSchema = new Schema({
       type: Number,
       required: true
     },
-    frequency: {
-      type: String,
-      enum: ['daily', 'weekly'],
-      required: true
-    }
+    
+    
   },
   status: {
     type: String,
@@ -72,4 +69,4 @@ const PoolSchema = new Schema({
   }
 });
 
-export default mongoose.model<IPool>('Pool', PoolSchema);
+export default mongoose.model<IGroup>('Group', GroupSchema);

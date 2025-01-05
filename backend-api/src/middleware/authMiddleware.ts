@@ -5,7 +5,7 @@ export interface AuthRequest extends Request {
     wallet_address: string;
     signature: string;
     message: string;
-    pool_id?: string;
+    group_id?: string;
 }
 
 export const authenticateToken = (req: AuthRequest, res: Response, next: NextFunction) => {
