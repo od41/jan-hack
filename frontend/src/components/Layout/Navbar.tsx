@@ -4,13 +4,12 @@ import { MyConnectButton } from '../MyConnectButton';
 
 export const Navbar: React.FC = () => {
     return (
-        <nav className="navbar">
-            <div className="navbar-content">
-                <div className="logo">
-                    {/* Logo goes here */}
-                    <p>FitFi</p>
+        <nav className="fixed top-0 left-0 w-full bg-white border-b border-gray-200">
+            <div className="flex items-center justify-between px-4 py-3">
+                <div className="flex items-center">
+                    <p className="text-xl font-bold text-gray-800">FitFiii</p>
                 </div>
-                <div className="connect-button">
+                <div>
                     <MyConnectButton />
                 </div>
             </div>
