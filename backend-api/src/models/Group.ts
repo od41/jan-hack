@@ -12,7 +12,7 @@ export interface IGroup extends Document {
     max_number: number;
     frequency: 'daily' | 'weekly' | 'monthly';  // tracking frequency
     min_distance: number; // in km
-    min_steps: number;
+    // min_steps: number;
   };
   status: 'pending' | 'active' | 'completed';
 }
@@ -55,10 +55,10 @@ const GroupSchema = new Schema({
       type: Number,
       required: true
     },
-    min_steps: {
-      type: Number,
-      required: true
-    },
+    // min_steps: {
+    //   type: Number,
+    //   required: true
+    // },
     
     
   },

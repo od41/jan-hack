@@ -30,7 +30,7 @@ router.post('/create', async (req: AuthRequest, res: Response) => {
     }
 
     // Validate rules fields
-    if (!rules.min_stake || !rules.max_members || !rules.frequency || !rules.min_distance || !rules.min_steps) {
+    if (!rules.min_stake || !rules.max_members || !rules.frequency || !rules.min_distance) {
       return res.status(400).json({
         message: 'Missing required rules fields'
       });
@@ -125,9 +125,9 @@ router.get('/:groupId/stats', async (req: AuthRequest, res: Response) => {
       if (session.movement_data.distance >= group.rules.min_distance) {
         stats.achievements.distance_goal_met += 1;
       }
-      if (session.movement_data.steps >= group.rules.min_steps) {
-        stats.achievements.steps_goal_met += 1;
-      }
+      // if (session.movement_data.steps >= group.rules.min_steps) {
+      //   stats.achievements.steps_goal_met += 1;
+      // }
     });
 
     res.json({

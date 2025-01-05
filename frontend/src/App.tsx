@@ -17,7 +17,7 @@ const App: React.FC = () => {
         <MobileCheck>
           <Routes>
             <Route path="/" element={<ConnectWalletPage />} />
-            
+
             <Route element={<MainLayout />}>
               <Route path="/groups" element={<GroupList groups={[]} />} />
               <Route path="/create-group" element={<CreateGroup />} />
