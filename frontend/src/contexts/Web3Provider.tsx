@@ -65,7 +65,9 @@ const siweConfig: SIWEConfig = {
     credentials: 'include',
 }).then((res) => res.ok ? res.json() : null),
 
-  signOut: async () => fetch(`${BASE_BACKEND_URL}/api/users/logout`).then((res) => res.ok),
+  signOut: async () => fetch(`${BASE_BACKEND_URL}/api/users/logout`, {
+    credentials: 'include',
+  }).then((res) => res.ok),
   
 };
 

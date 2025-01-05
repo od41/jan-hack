@@ -73,6 +73,11 @@ router.get('/session', async (req: AuthRequest, res: any) => {
   }
 });
 
+router.get('/logout', async (req: AuthRequest, res: any) => {
+  req.session.destroy();
+  return res.status(200).json({ ok: true });
+});
+
 router.post('/login', async (req: AuthRequest, res: any) => {
   try {
     const { signature, message, wallet_address } = req.body;

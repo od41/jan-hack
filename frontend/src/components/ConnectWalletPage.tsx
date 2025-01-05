@@ -24,9 +24,9 @@ export const ConnectWalletPage: React.FC<ConnectWalletProps> = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // if (isSignedIn) {
-  //   navigate('/groups');
-  // }
+  if (isSignedIn) {
+    navigate('/groups');
+  }
 
   return (
     <div className="relative h-screen w-screen">
@@ -35,7 +35,7 @@ export const ConnectWalletPage: React.FC<ConnectWalletProps> = () => {
         style={{ backgroundImage: `url(${backgrounds[currentBg]})` }}
       >
         <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center px-6">
-          <h1 className="text-4xl font-bold text-white mb-4">FitChain</h1>
+          <h1 className="text-4xl font-bold text-white mb-4">FitFi</h1>
           <p className="text-xl text-white mb-8 text-center">
             Run Together, Earn Together 🏃‍♂️💰
           </p>

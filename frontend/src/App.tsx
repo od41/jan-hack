@@ -13,21 +13,23 @@ import { MainLayout } from './components/Layout/MainLayout';
 const App: React.FC = () => {
   return (
     <CombinedProvider>
-      <MainLayout>
-        <BrowserRouter>
-          <MobileCheck>
-            <Routes>
+      <BrowserRouter>
+        <MobileCheck>
+          <Routes>
             <Route path="/" element={<ConnectWalletPage />} />
-            <Route path="/groups" element={<GroupList groups={[]} />} />
-            <Route path="/create-group" element={<CreateGroup />} />
-            <Route path="/join-group/:groupId" element={<JoinGroup />} />
-            <Route path="/activity/:groupId" element={<ActivityTracker />} />
-            <Route path="/performance/:groupId" element={<Performance />} />
+            
+            <Route element={<MainLayout />}>
+              <Route path="/groups" element={<GroupList groups={[]} />} />
+              <Route path="/create-group" element={<CreateGroup />} />
+              <Route path="/join-group/:groupId" element={<JoinGroup />} />
+              <Route path="/activity/:groupId" element={<ActivityTracker />} />
+              <Route path="/performance/:groupId" element={<Performance />} />
+            </Route>
+
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-          </MobileCheck>
-        </BrowserRouter>
-      </MainLayout>
+        </MobileCheck>
+      </BrowserRouter>
     </CombinedProvider>
   );
 };
