@@ -24,9 +24,9 @@ export const ConnectWalletPage: React.FC<ConnectWalletProps> = () => {
     return () => clearInterval(interval);
   }, []);
 
-  if (isSignedIn) {
-    navigate('/groups');
-  }
+  // if (isSignedIn) {
+  //   navigate('/groups');
+  // }
 
   return (
     <div className="relative h-screen w-screen">

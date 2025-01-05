@@ -8,23 +8,26 @@ import JoinGroup from './components/JoinGroup';
 import { ActivityTracker } from './components/ActivityTracker';
 import { Performance } from './components/Performance';
 import { CombinedProvider } from './contexts/CombinedProvider';
+import { MainLayout } from './components/Layout/MainLayout';
 
 const App: React.FC = () => {
   return (
     <CombinedProvider>
-    <BrowserRouter>
-      <MobileCheck>
-        <Routes>
-          <Route path="/" element={<ConnectWalletPage />} />
-          <Route path="/groups" element={<GroupList groups={[]} />} />
-          <Route path="/create-group" element={<CreateGroup />} />
-          <Route path="/join-group/:groupId" element={<JoinGroup />} />
-          <Route path="/activity/:groupId" element={<ActivityTracker />} />
-          <Route path="/performance/:groupId" element={<Performance />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </MobileCheck>
-    </BrowserRouter>
+      <MainLayout>
+        <BrowserRouter>
+          <MobileCheck>
+            <Routes>
+            <Route path="/" element={<ConnectWalletPage />} />
+            <Route path="/groups" element={<GroupList groups={[]} />} />
+            <Route path="/create-group" element={<CreateGroup />} />
+            <Route path="/join-group/:groupId" element={<JoinGroup />} />
+            <Route path="/activity/:groupId" element={<ActivityTracker />} />
+            <Route path="/performance/:groupId" element={<Performance />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+          </MobileCheck>
+        </BrowserRouter>
+      </MainLayout>
     </CombinedProvider>
   );
 };
