@@ -15,7 +15,7 @@ const App: React.FC = () => {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/wallet-connect" element={<WalletConnectPage />} />
         <Route path="/pools" element={<PoolListPage />} />
-        <Route path="/activity" element={<ActivityTrackingPage />} />
+        {/* <Route path="/activity" element={<ActivityTrackingPage />} /> */}
         <Route path="/pool/:poolId/join" element={<JoinPoolPage />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
