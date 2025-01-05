@@ -3,7 +3,8 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import protect from './middleware/authMiddleware';
-import Session from 'express-session';
+import session from 'express-session';
+import MongoStore from 'connect-mongo';
 
 // Import routes
 import userRoutes from './routes/userRoutes';
@@ -24,16 +25,27 @@ const app = express();
 
 app.use(express.json());
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: process.env.FRONTEND_URL || "http://localhost:5173",
   credentials: true,
 }));
 app.use(express.urlencoded({ extended: true }));
-app.use(Session({
+
+// Updated session configuration
+app.use(session({
   name: 'siwe-quickstart',
-  secret: "siwe-quickstart-secret",
-  resave: true,
-  saveUninitialized: false,
-  cookie: { secure: false, sameSite: "lax" }
+  secret: process.env.SESSION_SECRET || "siwe-quickstart-secret",
+  resave: false,
+  saveUninitialized: true,
+  store: MongoStore.create({
+    mongoUrl: MONGODB_URI,
+    collectionName: 'sessions'
+  }),
+  cookie: { 
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    httpOnly: true
+  }
 }));
 
 // Public routes

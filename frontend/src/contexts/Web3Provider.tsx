@@ -54,13 +54,16 @@ const siweConfig: SIWEConfig = {
   
   verifyMessage: async ({ message, signature }) => fetch(`${BASE_BACKEND_URL}/api/users/verify`, {
     method: 'POST',
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ message, signature }),
   }).then((res) => res.ok),
   
-  getSession: async () => fetch(`${BASE_BACKEND_URL}/api/users/session`).then((res) => res.ok ? res.json() : null),
+  getSession: async () => fetch(`${BASE_BACKEND_URL}/api/users/session`,{
+    credentials: 'include',
+}).then((res) => res.ok ? res.json() : null),
 
   signOut: async () => fetch(`${BASE_BACKEND_URL}/api/users/logout`).then((res) => res.ok),
   

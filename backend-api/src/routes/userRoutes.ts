@@ -18,17 +18,15 @@ router.post('/verify', async (req: AuthRequest, res: any) => {
   const { message, signature } = req.body;
   const siweMessage = new SiweMessage(message);
   try {
-        const siwe = await siweMessage.verify({ signature });
-        if (siwe.success) {
-          req.session.siwe = siwe
-          await req.session.save()
-         // @ts-ignore
-    const walletAddress = siwe.data.address
-    // @ts-ignore
-      const chainId = siwe.data.chainId
+    const siwe = await siweMessage.verify({ signature });
+    if (siwe.success) {
+      req.session.siwe = { data: siwe.data };
+      await req.session.save();
+      const walletAddress = siwe.data.address;
+      const chainId = siwe.data.chainId;
       // Find or create user
       let user = await User.findOne({ wallet_address: walletAddress });
-      if(!user) {
+      if (!user) {
         user = await User.create({
           wallet_address: walletAddress,
           username: walletAddress
@@ -40,32 +38,25 @@ router.post('/verify', async (req: AuthRequest, res: any) => {
         process.env.JWT_SECRET!,
         { expiresIn: '24h' }
       );
-  
-      return res.status(200).json({user, token, ok: true, address: walletAddress, chainId});
-        } else {
-          return res.send(false)
-        }
-    } catch {
-        return res.send(false);
+
+      return res.status(200).json({ user, token, ok: true, address: walletAddress, chainId });
+    } else {
+      return res.send(false);
     }
+  } catch {
+    return res.send(false);
+  }
 });
 
-
-
 router.get('/session', async (req: AuthRequest, res: any) => {
-  console.log('sess get', req.session, req.session.siwe)
-
-  // @ts-ignore
   if (!req.session.siwe) {
-    return res.status(404).send(` user not found`);
+    return res.status(404).send('User not found');
   } else {
-  // @ts-ignore
-    const walletAddress = req.session.siwe.data.address
-  // @ts-ignore
-    const chainId = req.session.siwe.data.chainId
+    const walletAddress = req.session.siwe.data.address;
+    const chainId = req.session.siwe.data.chainId;
     // Find or create user
     let user = await User.findOne({ wallet_address: walletAddress });
-    if(!user) {
+    if (!user) {
       user = await User.create({
         wallet_address: walletAddress,
         username: walletAddress
@@ -78,7 +69,7 @@ router.get('/session', async (req: AuthRequest, res: any) => {
       { expiresIn: '24h' }
     );
 
-    return res.status(200).json({user, token, ok: true, address: walletAddress, chainId});
+    return res.status(200).json({ user, token, ok: true, address: walletAddress, chainId });
   }
 });
 
