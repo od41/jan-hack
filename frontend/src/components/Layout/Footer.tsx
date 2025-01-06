@@ -3,7 +3,7 @@ import React from 'react';
 export const Footer: React.FC = () => {
     const FOOTER_ITEMS = [
         { label: "Discover", icon: <></>, url: "/groups" },
-        { label: "My Groups", icon: <></>, url: "/activity" },
+        { label: "My Groups", icon: <></>, url: "/my-groups" },
         { label: "Rewards", icon: <></>, url: "/rewards" },
     ]
     return (

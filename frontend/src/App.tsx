@@ -9,6 +9,8 @@ import { ActivityTracker } from './components/ActivityTracker';
 import { Performance } from './components/Performance';
 import { CombinedProvider } from './contexts/CombinedProvider';
 import { MainLayout } from './components/Layout/MainLayout';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { Rewards } from './components/Rewards';
 
 const App: React.FC = () => {
   return (
@@ -20,11 +22,14 @@ const App: React.FC = () => {
 
             <Route element={<MainLayout />}>
               <Route path="/groups" element={<GroupList />} />
-              <Route path="/activity" element={<GroupList showMyGroups />} />
-              <Route path="/create-group" element={<CreateGroup />} />
-              <Route path="/join-group/:groupId" element={<JoinGroup />} />
-              <Route path="/activity/:groupId" element={<ActivityTracker />} />
-              <Route path="/performance/:groupId" element={<Performance />} />
+              <Route element={<ProtectedRoute />}>
+                <Route path="/my-groups" element={<GroupList showMyGroups />} />
+                <Route path="/create-group" element={<CreateGroup />} />
+                <Route path="/join-group/:groupId" element={<JoinGroup />} />
+                <Route path="/activity/:groupId" element={<ActivityTracker />} />
+                <Route path="/performance/:groupId" element={<Performance />} />
+                <Route path="/rewards" element={<Rewards />} />
+              </Route>
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />

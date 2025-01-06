@@ -51,7 +51,7 @@ const siweConfig: SIWEConfig = {
     nonce,
     statement: 'Sign in to FitFi.',
   }).prepareMessage(),
-  
+
   verifyMessage: async ({ message, signature }) => fetch(`${BASE_BACKEND_URL}/api/users/verify`, {
     method: 'POST',
     credentials: 'include',
@@ -60,15 +60,14 @@ const siweConfig: SIWEConfig = {
     },
     body: JSON.stringify({ message, signature }),
   }).then((res) => res.ok),
-  
-  getSession: async () => fetch(`${BASE_BACKEND_URL}/api/users/session`,{
+
+  getSession: async () => fetch(`${BASE_BACKEND_URL}/api/users/session`, {
     credentials: 'include',
-}).then((res) => res.ok ? res.json() : null),
+  }).then((res) => res.ok ? res.json() : null),
 
   signOut: async () => fetch(`${BASE_BACKEND_URL}/api/users/logout`, {
     credentials: 'include',
   }).then((res) => res.ok),
-  
 };
 
 export const Web3Provider = ({ children }: { children: React.ReactNode }) => {
