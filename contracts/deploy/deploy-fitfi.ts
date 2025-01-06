@@ -2,6 +2,7 @@ import { Wallet, utils } from "zksync-ethers";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { Deployer } from "@matterlabs/hardhat-zksync-deploy";
 import { getWallet, deployContract } from "./utils";
+import { generateFrontendFiles } from "./utils/generateFrontendFiles";
 
 export default async function (hre: HardhatRuntimeEnvironment) {
   console.log(`Running deploy script for FitFi contract`);
@@ -60,6 +61,9 @@ export default async function (hre: HardhatRuntimeEnvironment) {
       ],
     });
   }
+
+   // Generate frontend files
+   await generateFrontendFiles('FitFi', fitFi, hre.network.name);
 
   console.log("Deployment completed!");
 } 
