@@ -5,6 +5,40 @@ import Group from '../models/Group';
 
 const router = Router();
 
+// Get all groups
+router.get('/', async (req: Request, res: Response) => {
+  try {
+    const groups = await Group.find(); // Fetch all groups from the database
+    res.json(groups); // Return the groups as a JSON response
+  } catch (error) {
+    console.error('Error fetching groups:', error);
+    res.status(500).json({ message: 'Error fetching groups' });
+  }
+});
+
+// Get groups for a specific user
+// @ts-ignore
+router.get('/joined', async (req: AuthRequest, res: Response) => {
+  try {
+    const wallet_address = req.session.siwe?.data.address;
+
+    if (!wallet_address) {
+      return res.status(400).json({ message: 'No wallet address found in session' });
+    }
+    
+    const groups = await Group.find({ joined_users: wallet_address });
+
+    if(!groups || groups.length === 0) {
+      return res.status(404).json({ message: 'No groups found' });
+    }
+    
+    res.status(200).json(groups);
+  } catch (error) {
+    console.error('Error fetching user groups:', error);
+    res.status(500).json({ message: 'Error fetching user groups' });
+  }
+});
+
 // Create group metadata
 // @ts-ignore
 router.post('/create', async (req: AuthRequest, res: Response) => {
@@ -78,7 +112,7 @@ router.get('/:groupId', async (req: Request, res: Response) => {
     //   await group.save();
     // }
 
-    res.json(group);
+    res.status(200).json(group);
   } catch (error) {
     console.error('Error fetching group:', error);
     res.status(500).json({ message: 'Error fetching group details' });
@@ -150,49 +184,6 @@ router.get('/:groupId/stats', async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error('Error fetching group stats:', error);
     res.status(500).json({ message: 'Error fetching group statistics' });
-  }
-});
-
-// Get all groups
-router.get('/', async (req: Request, res: Response) => {
-  try {
-    const groups = await Group.find(); // Fetch all groups from the database
-    res.json(groups); // Return the groups as a JSON response
-  } catch (error) {
-    console.error('Error fetching groups:', error);
-    res.status(500).json({ message: 'Error fetching groups' });
-  }
-});
-
-// Get groups for a specific user
-// @ts-ignore
-router.get('/joined', async (req: AuthRequest, res: Response) => {
-  try {
-    const wallet_address = req.session.siwe?.data.address;
-    
-    // Debug logs
-    console.log('Session:', req.session);
-    console.log('SIWE data:', req.session.siwe);
-    console.log('Searching for wallet address:', wallet_address);
-
-    if (!wallet_address) {
-      return res.status(400).json({ message: 'No wallet address found in session' });
-    }
-
-    // Fetch groups where the user has joined
-    const groups = await Group.find({ joined_users: wallet_address });
-    
-    // Debug log
-    console.log('Query result:', groups);
-
-    if(!groups || groups.length === 0) {
-      return res.status(404).json({ message: 'No groups found' });
-    }
-    
-    res.status(200).json(groups);
-  } catch (error) {
-    console.error('Error fetching user groups:', error);
-    res.status(500).json({ message: 'Error fetching user groups' });
   }
 });
 

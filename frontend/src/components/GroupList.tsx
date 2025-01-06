@@ -24,10 +24,10 @@ const GroupList: React.FC<GroupListProps> = ({ showMyGroups = false }) => {
                     credentials: 'include',
                 });
                 if (!response.ok) {
-                    throw new Error('Failed to fetch groups');
+                    const { message } = await response.json()
+                    throw new Error(message || 'Failed to fetch groups');
                 }
                 const data = await response.json() as Group[];
-                console.log('data', data)
                 setGroups(data);
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'An error occurred');
