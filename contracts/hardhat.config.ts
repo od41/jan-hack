@@ -25,6 +25,12 @@ const config: HardhatUserConfig = {
         "https://api-explorer-verify.staging.lens.zksync.dev/contract_verification",
       zksync: true,
     },
+    localhost: {
+      zksync: true,
+      url: "http://localhost:8545",
+      loggingEnabled: true,
+      ethNetwork: "localhost",
+    },
     hardhat: {
       zksync: true,
       loggingEnabled: true,

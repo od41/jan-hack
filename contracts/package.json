@@ -7,7 +7,8 @@
     "clean": "yarn clean:artifacts && yarn clean:upgradable",
     "deploy": "hardhat deploy-zksync",
     "lint": "hardhat check",
-    "test": "yarn clean:upgradable && hardhat test --show-stack-traces"
+    "test": "yarn clean:upgradable && hardhat test --show-stack-traces",
+    "node": "yarn clean:upgradable && hardhat node"
   },
   "devDependencies": {
     "@matterlabs/hardhat-zksync": "^1.1.0",
