@@ -10,14 +10,14 @@ const JoinGroup: React.FC = () => {
 
     // @TODO: Mock group data - replace with actual data fetching
     const group: Group = {
-        id: groupId || '',
+        group_id: groupId || '',
         name: 'Marathon Masters',
         description: 'Training for the next marathon together!',
-        minStake: '0.1',
-        maxMembers: 50,
+        min_stake: '0.1',
+        max_members: 50,
         frequency: 'daily',
-        currentMembers: 24,
-        totalStaked: '2.4'
+        current_members: 24,
+        total_staked: '2.4'
     };
 
     const handleStake = async () => {

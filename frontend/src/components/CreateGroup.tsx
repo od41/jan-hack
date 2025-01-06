@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BASE_BACKEND_URL } from '../contexts/AppProvider';
+import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
+import { getFitFiContract, publicClient } from '../contracts';
+import { decodeEventLog } from 'viem';
+import { FitFiConfig, FitFiFunctions, type FitFiEvents } from '../contracts/FitFi';
 
 interface CreateGroupForm {
     name: string;
@@ -23,6 +27,21 @@ const CreateGroup: React.FC = () => {
         maxMembers: 10,
         frequency: 'daily'
     });
+
+    // Get contract config
+    const contract = getFitFiContract();
+
+    // Setup contract write hook with proper typing
+    const { writeContract, data: hash } = useWriteContract<
+        FitFiConfig['abi'],
+        'createPool'
+    >()
+
+    // Setup transaction receipt hook
+    const { isLoading: isConfirming, isSuccess: isConfirmed } =
+        useWaitForTransactionReceipt({
+            hash,
+        })
 
     const validateForm = () => {
         if (form.name.length < 3) {
@@ -54,6 +73,47 @@ const CreateGroup: React.FC = () => {
 
         setLoading(true);
         try {
+            // 1. Create pool on-chain
+            const startTime = BigInt(Math.floor(Date.now() / 1000) + 3600); // Start in 1 hour
+            const duration = BigInt(
+                form.frequency === 'daily' ? 86400 :
+                    form.frequency === 'weekly' ? 604800 :
+                        2592000 // monthly
+            );
+
+            // Write to contract with proper typing
+            writeContract({
+                address: contract.address,
+                abi: contract.abi,
+                functionName: 'createPool',
+                args: [startTime, duration],
+            })
+
+            // Wait for confirmation
+            if (!hash || !isConfirmed) {
+                throw new Error('Transaction failed');
+            }
+
+            // Get transaction receipt and find pool ID
+            const receipt = await publicClient.getTransactionReceipt({ hash });
+            const event = receipt.logs.find(log => {
+                try {
+                    const decoded = decodeEventLog({
+                        abi: contract.abi,
+                        data: log.data,
+                        topics: log.topics,
+                    }) as { eventName: keyof FitFiEvents };
+                    return decoded.eventName === 'PoolCreated';
+                } catch {
+                    return false;
+                }
+            });
+
+            if (!event) throw new Error('Pool creation event not found');
+
+            const groupId = event.args?.poolId;
+
+            // 2. Create group in backend
             const response = await fetch(`${BASE_BACKEND_URL}/api/groups/create`, {
                 method: 'POST',
                 credentials: 'include',
@@ -61,7 +121,7 @@ const CreateGroup: React.FC = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    group_id: crypto.randomUUID(), // @TODO: get ID from smart contract
+                    group_id: groupId.toString(),
                     metadata: {
                         name: form.name,
                         description: form.description
@@ -137,7 +197,7 @@ const CreateGroup: React.FC = () => {
 
                 <div className='w-full flex justify-between items-center gap-4'>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">Minimum Stake (GRASS)</label>
+                        <label className="block text-sm font-medium text-gray-700">Min. Stake (GRASS)</label>
                         <input
                             type="number"
                             step="0.01"
