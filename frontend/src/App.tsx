@@ -19,7 +19,8 @@ const App: React.FC = () => {
             <Route path="/" element={<ConnectWalletPage />} />
 
             <Route element={<MainLayout />}>
-              <Route path="/groups" element={<GroupList groups={[]} />} />
+              <Route path="/groups" element={<GroupList />} />
+              <Route path="/activity" element={<GroupList showMyGroups />} />
               <Route path="/create-group" element={<CreateGroup />} />
               <Route path="/join-group/:groupId" element={<JoinGroup />} />
               <Route path="/activity/:groupId" element={<ActivityTracker />} />
