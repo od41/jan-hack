@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fromBlobs } from 'viem';
+import { BASE_BACKEND_URL } from '../contexts/AppProvider';
 
 interface CreateGroupForm {
     name: string;
@@ -54,8 +54,9 @@ const CreateGroup: React.FC = () => {
 
         setLoading(true);
         try {
-            const response = await fetch('/api/groups/create', {
+            const response = await fetch(`${BASE_BACKEND_URL}/api/groups/create`, {
                 method: 'POST',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                 },

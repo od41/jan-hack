@@ -4,7 +4,6 @@ import { Spinner } from './Layout/Spinner';
 
 export const ProtectedRoute = () => {
     const { isSignedIn, isLoading } = useSIWE();
-    console.log('isSignedIn', isSignedIn, isLoading)
 
     if (isLoading) {
         return <Spinner />;

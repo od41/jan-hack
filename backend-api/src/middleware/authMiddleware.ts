@@ -1,44 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
 
 export interface AuthRequest extends Request {
-    wallet_address: string;
-    signature: string;
-    message: string;
-    group_id?: string;
+  wallet_address?: string;
+  group_id?: string;
 }
-
-export const authenticateToken = (req: AuthRequest, res: Response, next: NextFunction) => {
-    try {
-        const authHeader = req.headers.authorization;
-        if (!authHeader) {
-            return res.status(401).json({ message: 'Authentication token required' });
-        }
-
-        const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
-        if (!token) {
-            return res.status(401).json({ message: 'Invalid token format' });
-        }
-
-        const jwtSecret = process.env.JWT_SECRET;
-        if (!jwtSecret) {
-            console.error('JWT_SECRET is not defined');
-            return res.status(500).json({ message: 'Server configuration error' });
-        }
-
-        const decoded = jwt.verify(token, jwtSecret) as { id: string; role: string };
-        req.body = decoded;
-        next();
-    } catch (error) {
-        if (error instanceof jwt.JsonWebTokenError) {
-            return res.status(403).json({ message: 'Invalid token' });
-        } else if (error instanceof jwt.TokenExpiredError) {
-            return res.status(403).json({ message: 'Token has expired' });
-        }
-        console.error('Token verification error:', error);
-        return res.status(500).json({ message: 'Error processing authentication' });
-    }
-};
 
 const authMiddleware = async (
   req: Request,
@@ -46,33 +11,48 @@ const authMiddleware = async (
   next: NextFunction
 ) => {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-        return res.status(401).json({ message: 'Authentication token required' });
+    // 1. Check if session exists
+    if (!req.session) {
+      return res.status(401).json({ message: 'No session found' });
     }
 
-    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
-    
-    if (!token) {
-      return res.status(401).json({ message: 'Authentication required' });
+    // 2. Check if session is valid (not expired)
+    if (req.session.cookie.expires && new Date() > req.session.cookie.expires) {
+      // Destroy the invalid session
+      await new Promise<void>((resolve) => {
+        req.session.destroy((err) => {
+          if (err) console.error('Session destruction error:', err);
+          resolve();
+        });
+      });
+      return res.status(401).json({ message: 'Session expired' });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
-      wallet_address: string;
-    };
-    // Preserve existing request body params
+    // 3. Verify SIWE session data exists and is valid
+    if (!req.session.siwe?.data.address || 
+        !req.session.siwe?.data.chainId) {
+      return res.status(401).json({ message: 'Invalid session data' });
+    }
+
+    // 4. Optional: Verify chain ID matches your expected network
+    if (req.session.siwe?.data.chainId !== Number(process.env.EXPECTED_CHAIN_ID!)) {
+      return res.status(401).json({ message: 'Invalid network' });
+    }
+
+    // 5. Optional but recommended: Refresh session expiry
+    req.session.touch();
+
+    // Merge session data with existing body params
     const existingBody = { ...req.body };
-    
-    // Merge decoded token data with existing body params
     req.body = {
       ...existingBody,
-      wallet_address: decoded.wallet_address
+      wallet_address: req.session.siwe.data.address
     };
     
-    // req.body = decoded;
     next();
   } catch (error) {
-    return res.status(401).json({ message: 'Invalid token' });
+    console.error('Session verification error:', error);
+    return res.status(401).json({ message: 'Session verification failed' });
   }
 };
 
