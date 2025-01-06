@@ -1,19 +1,46 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Group } from '../types';
+import { Spinner } from './Layout/Spinner';
+import { BASE_BACKEND_URL } from '../contexts/AppProvider';
 
 interface GroupListProps {
-    groups?: Group[];
     showMyGroups?: boolean;
 }
 
-const dummyGroups: Group[] = [
-    { id: '1', name: 'Group 1', description: 'Description 1', totalStaked: '0.1', currentMembers: 5, maxMembers: 10, minStake: '0.1', frequency: 'daily' },
-    { id: '2', name: 'Group 2', description: 'Description 2', totalStaked: '0.1', currentMembers: 3, maxMembers: 10, minStake: '0.1', frequency: 'daily' },
-];
-
-const GroupList: React.FC<GroupListProps> = ({ groups = dummyGroups, showMyGroups = false }) => {
+const GroupList: React.FC<GroupListProps> = ({ showMyGroups = false }) => {
     const navigate = useNavigate();
+    const [groups, setGroups] = useState<Group[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchGroups = async () => {
+            try {
+                const url = showMyGroups
+                    ? `${BASE_BACKEND_URL}/api/groups/joined`
+                    : `${BASE_BACKEND_URL}/api/groups`;
+                const response = await fetch(url, {
+                    credentials: 'include',
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to fetch groups');
+                }
+                const data = await response.json() as Group[];
+                console.log('data', data)
+                setGroups(data);
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'An error occurred');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchGroups();
+    }, [showMyGroups]);
+
+    if (loading) return <Spinner />;
+    if (error) return <div>Error: {error}</div>;
 
     return (
         <div className="min-h-screen bg-gray-100 p-4">
@@ -31,17 +58,17 @@ const GroupList: React.FC<GroupListProps> = ({ groups = dummyGroups, showMyGroup
                 <div className="space-y-4">
                     {groups.map((group) => (
                         <div
-                            key={group.id}
-                            className="bg-white rounded-xl p-4 shadow-md active:bg-gray-50"
-                            onClick={() => navigate(`/join-group/${group.id}`)}
+                            key={group.group_id}
+                            className="bg-white rounded-xl p-4 shadow-md active:bg-gray-50 cursor-pointer"
+                            onClick={() => navigate(`/join-group/${group.group_id}`)}
                         >
-                            <h2 className="text-xl font-semibold">{group.name}</h2>
+                            <h2 className="text-xl font-semibold">{group.metadata.name}</h2>
                             <div className="flex space-x-4 mt-2 text-sm text-gray-600">
-                                <span>👥 {group.currentMembers}/{group.maxMembers}</span>
-                                <span>💰 {group.minStake}</span>
-                                <span>🔄 {group.frequency}</span>
+                                <span>👥 {group.metadata.signed_up_members} / {group.rules.max_members}</span>
+                                <span>💰 {group.rules.min_stake}</span>
+                                <span>🔄 {group.rules.frequency}</span>
                             </div>
-                            <p className="mt-2 text-gray-700">{group.description}</p>
+                            <p className="mt-2 text-gray-700">{group.metadata.description}</p>
                         </div>
                     ))}
                 </div>

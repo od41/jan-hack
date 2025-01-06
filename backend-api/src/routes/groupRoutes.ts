@@ -8,6 +8,7 @@ const router = Router();
 // Create group metadata
 // @ts-ignore
 router.post('/create', async (req: AuthRequest, res: Response) => {
+  const wallet_address = req.session.siwe?.data.address;
   try {
     const { 
       group_id,
@@ -44,7 +45,8 @@ router.post('/create', async (req: AuthRequest, res: Response) => {
         created_at: new Date(),
       },
       rules,
-      status: 'pending'
+      status: 'pending',
+      joined_users: [wallet_address]
     });
 
     res.status(201).json(group);
@@ -148,6 +150,83 @@ router.get('/:groupId/stats', async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error('Error fetching group stats:', error);
     res.status(500).json({ message: 'Error fetching group statistics' });
+  }
+});
+
+// Get all groups
+router.get('/', async (req: Request, res: Response) => {
+  try {
+    const groups = await Group.find(); // Fetch all groups from the database
+    res.json(groups); // Return the groups as a JSON response
+  } catch (error) {
+    console.error('Error fetching groups:', error);
+    res.status(500).json({ message: 'Error fetching groups' });
+  }
+});
+
+// Get groups for a specific user
+// @ts-ignore
+router.get('/joined', async (req: AuthRequest, res: Response) => {
+  try {
+    const wallet_address = req.session.siwe?.data.address;
+    
+    // Debug logs
+    console.log('Session:', req.session);
+    console.log('SIWE data:', req.session.siwe);
+    console.log('Searching for wallet address:', wallet_address);
+
+    if (!wallet_address) {
+      return res.status(400).json({ message: 'No wallet address found in session' });
+    }
+
+    // Fetch groups where the user has joined
+    const groups = await Group.find({ joined_users: wallet_address });
+    
+    // Debug log
+    console.log('Query result:', groups);
+
+    if(!groups || groups.length === 0) {
+      return res.status(404).json({ message: 'No groups found' });
+    }
+    
+    res.status(200).json(groups);
+  } catch (error) {
+    console.error('Error fetching user groups:', error);
+    res.status(500).json({ message: 'Error fetching user groups' });
+  }
+});
+
+// Add user to group
+// @ts-ignore
+router.post('/:groupId/join', async (req: AuthRequest, res: Response) => {
+  const wallet_address = req.session.siwe?.data.address;
+  const { groupId } = req.params;
+  const userId = req.body.userId; // Assuming user ID is sent in the request body
+
+  try {
+    const group = await Group.findOne({ group_id: groupId });
+    if (!group) {
+      return res.status(404).json({ message: 'Group not found' });
+    }
+
+    if (group.joined_users.length >= group.rules.max_members) {
+      return res.status(400).json({ message: 'Maximum number of members reached' });
+    }
+
+    // Check if user is already a member
+    if (group.joined_users.includes(wallet_address!)) {
+      return res.status(400).json({ message: 'User already joined the group' });
+    }
+
+    // Add user to the joined_users array
+    group.joined_users.push(userId);
+    group.metadata.signed_up_members = (group.metadata.signed_up_members || 0) + 1; // Increment signed up members
+    await group.save();
+
+    res.status(200).json(group);
+  } catch (error) {
+    console.error('Error joining group:', error);
+    res.status(500).json({ message: 'Error joining group' });
   }
 });
 

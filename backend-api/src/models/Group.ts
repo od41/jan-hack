@@ -5,16 +5,18 @@ export interface IGroup extends Document {
   metadata: {
     name: string;
     description: string;
+    signed_up_members?: number;
     created_at: Date;
   };
   rules: {
     min_stake: number;
-    max_number: number;
+    max_members: number;
     frequency: 'daily' | 'weekly' | 'monthly';  // tracking frequency
     min_distance: number; // in km
     // min_steps: number;
   };
   status: 'pending' | 'active' | 'completed';
+  joined_users: string[]; // New field to store user IDs of joined users
 }
 
 const GroupSchema = new Schema({
@@ -31,6 +33,10 @@ const GroupSchema = new Schema({
     description: {
       type: String,
       required: true
+    },
+    signed_up_members: {
+      type: Number,
+      default: 1
     },
     created_at: {
       type: Date,
@@ -54,18 +60,16 @@ const GroupSchema = new Schema({
     min_distance: {
       type: Number,
       required: true
-    },
-    // min_steps: {
-    //   type: Number,
-    //   required: true
-    // },
-    
-    
+    },    
   },
   status: {
     type: String,
     enum: ['pending', 'active', 'completed'],
     default: 'pending'
+  },
+  joined_users: {
+    type: [String], // Array of user IDs
+    default: []
   }
 });
 

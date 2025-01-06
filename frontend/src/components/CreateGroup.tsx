@@ -61,7 +61,7 @@ const CreateGroup: React.FC = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    pool_id: crypto.randomUUID(), // @TODO: get ID from smart contract
+                    group_id: crypto.randomUUID(), // @TODO: get ID from smart contract
                     metadata: {
                         name: form.name,
                         description: form.description
@@ -179,7 +179,7 @@ const CreateGroup: React.FC = () => {
                         <label className="block text-sm font-medium text-gray-700">Min. Distance (KM)</label>
                         <input
                             type="number"
-                            value={form.maxMembers}
+                            value={form.minDistance}
                             onChange={(e) => setForm({ ...form, minDistance: parseInt(e.target.value) })}
                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
                             required
