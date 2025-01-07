@@ -37,4 +37,4 @@ Key technologies:
 ## Technical Architecture
 ![FitFi Technical Architecture](./fitfi-architecture-diagram.png)
 
-### License: [MIT](./LICENSE)
+### License: [GNU GPL v3](./LICENSE)
