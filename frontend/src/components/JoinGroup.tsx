@@ -11,13 +11,19 @@ const JoinGroup: React.FC = () => {
     // @TODO: Mock group data - replace with actual data fetching
     const group: Group = {
         group_id: groupId || '',
-        name: 'Marathon Masters',
-        description: 'Training for the next marathon together!',
-        min_stake: '0.1',
-        max_members: 50,
-        frequency: 'daily',
-        current_members: 24,
-        total_staked: '2.4'
+        metadata: {
+            name: 'Marathon Masters',
+            description: 'Training for the next marathon together!',
+            created_at: new Date(),
+            signed_up_members: 3
+        },
+        rules: {
+            min_stake: 0.1,
+            max_members: 50,
+            frequency: 'daily',
+            min_distance: 100
+        },
+        status: 'pending'
     };
 
     const handleStake = async () => {
@@ -36,32 +42,32 @@ const JoinGroup: React.FC = () => {
     return (
         <div className="min-h-screen bg-gray-100">
             <div className="p-4">
-                <h1 className="text-2xl font-bold mb-6">{group.name}</h1>
+                <h1 className="text-2xl font-bold mb-6">{group.metadata.name}</h1>
 
                 <div className="bg-white rounded-xl p-6 shadow-md space-y-4">
                     <div className="flex justify-between items-center">
                         <span className="text-gray-600">Members</span>
                         <span className="font-semibold">
-                            {group.currentMembers}/{group.maxMembers}
+                            {group.metadata.signed_up_members}/{group.rules.max_members}
                         </span>
                     </div>
 
                     <div className="flex justify-between items-center">
                         <span className="text-gray-600">Stake Required</span>
-                        <span className="font-semibold">{group.minStake} ETH</span>
+                        <span className="font-semibold">{group.rules.min_stake} ETH</span>
                     </div>
 
                     <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Total Staked</span>
-                        <span className="font-semibold">{group.totalStaked} ETH</span>
+                        <span className="text-gray-600">Min Distance</span>
+                        <span className="font-semibold">{group.rules.min_distance} meters</span>
                     </div>
 
                     <div className="flex justify-between items-center">
                         <span className="text-gray-600">Frequency</span>
-                        <span className="font-semibold capitalize">{group.frequency}</span>
+                        <span className="font-semibold capitalize">{group.rules.frequency}</span>
                     </div>
 
-                    <p className="text-gray-700 py-4">{group.description}</p>
+                    <p className="text-gray-700 py-4">{group.metadata.description}</p>
 
                     <button
                         onClick={() => setShowStakingModal(true)}
@@ -77,14 +83,14 @@ const JoinGroup: React.FC = () => {
                     <div className="bg-white rounded-xl p-6 w-full max-w-sm">
                         <h2 className="text-xl font-bold mb-4">Stake to Join</h2>
                         <p className="text-gray-600 mb-4">
-                            You need to stake {group.minStake} ETH to join this group.
+                            You need to stake {group.rules.min_stake} ETH to join this group.
                         </p>
                         <button
                             onClick={handleStake}
                             disabled={isStaking}
                             className="w-full bg-purple-600 text-white py-3 rounded-full font-semibold disabled:opacity-50"
                         >
-                            {isStaking ? 'Staking...' : `Stake ${group.minStake} ETH`}
+                            {isStaking ? 'Staking...' : `Stake ${group.rules.min_stake} ETH`}
                         </button>
                         <button
                             onClick={() => setShowStakingModal(false)}
