@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BASE_BACKEND_URL } from '../contexts/AppProvider';
-import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
+import { useWriteContract } from 'wagmi'
 import { getFitFiContract, publicClient } from '../contracts';
 import { decodeEventLog } from 'viem';
-import { FitFiConfig, FitFiFunctions, type FitFiEvents } from '../contracts/FitFi';
+import type { FitFiEvents } from '../contracts/FitFi';
 
 interface CreateGroupForm {
     name: string;
@@ -28,20 +28,11 @@ const CreateGroup: React.FC = () => {
         frequency: 'daily'
     });
 
+    const [groupId, setGroupId] = useState<string | null>(null);
+
     // Get contract config
     const contract = getFitFiContract();
-
-    // Setup contract write hook with proper typing
-    const { writeContract, data: hash } = useWriteContract<
-        FitFiConfig['abi'],
-        'createPool'
-    >()
-
-    // Setup transaction receipt hook
-    const { isLoading: isConfirming, isSuccess: isConfirmed } =
-        useWaitForTransactionReceipt({
-            hash,
-        })
+    const { writeContract: contractCreatePool, data: hash, error: writeContractError } = useWriteContract();
 
     const validateForm = () => {
         if (form.name.length < 3) {
@@ -63,44 +54,19 @@ const CreateGroup: React.FC = () => {
         return true;
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError(null);
-
-        if (!validateForm()) {
-            return;
-        }
-
-        setLoading(true);
-        try {
-            // 1. Create pool on-chain
-            const startTime = BigInt(Math.floor(Date.now() / 1000) + 3600); // Start in 1 hour
-            const duration = BigInt(
-                form.frequency === 'daily' ? 86400 :
-                    form.frequency === 'weekly' ? 604800 :
-                        2592000 // monthly
-            );
-
-            // Write to contract with proper typing
-            writeContract({
-                address: contract.address,
-                abi: contract.abi,
-                functionName: 'createPool',
-                args: [startTime, duration],
-            })
-
-            // Wait for confirmation
-            if (!hash || !isConfirmed) {
-                throw new Error('Transaction failed');
-            }
-
-            // Get transaction receipt and find pool ID
+    useEffect(() => {
+        const verifyTransaction = async () => {
+            // Wait for transaction to be mined
             const receipt = await publicClient.getTransactionReceipt({ hash });
+
+            // Get pool ID from events
             const event = receipt.logs.find(log => {
+
                 try {
                     const decoded = decodeEventLog({
                         abi: contract.abi,
                         data: log.data,
+                        // @ts-ignore
                         topics: log.topics,
                     }) as { eventName: keyof FitFiEvents };
                     return decoded.eventName === 'PoolCreated';
@@ -109,11 +75,57 @@ const CreateGroup: React.FC = () => {
                 }
             });
 
-            if (!event) throw new Error('Pool creation event not found');
+            if (!event) throw new Error('Group creation transaction not found');
 
-            const groupId = event.args?.poolId;
+            const decodedEvent = decodeEventLog({
+                abi: contract.abi,
+                data: event.data,
+                // @ts-ignore
+                topics: event.topics,
+            }) as { eventName: keyof FitFiEvents };
 
-            // 2. Create group in backend
+            // @ts-ignore
+            const _groupId = decodedEvent.args?.poolId;
+            setGroupId(_groupId)
+        }
+        verifyTransaction()
+    }, [hash])
+
+    useEffect(() => {
+        const createGroup = async () => {
+            if (groupId) {
+                const res = await createGroupInBackend(groupId, form)
+                if (res.ok) {
+                    setLoading(false);
+                    navigate('/groups');
+                }
+            }
+        }
+        createGroup()
+    }, [groupId])
+
+    const createGroupInContract = async () => {
+        // 1. Create pool on-chain
+        const startTime = BigInt(Math.floor(Date.now() / 1000) + 3600); // Start in 1 hour
+        const duration = BigInt(form.frequency === 'daily' ? 86400 :
+            form.frequency === 'weekly' ? 604800 :
+                2592000 // monthly
+        );
+
+        // @ts-ignore
+        contractCreatePool({
+            address: contract.address,
+            abi: contract.abi,
+            functionName: 'createPool',
+            args: [startTime, duration],
+        });
+
+        return true;
+    }
+
+    const createGroupInBackend = async (groupId: string, form: CreateGroupForm) => {
+        try {
+            // 2. Create group in backend only after successful contract interaction
             const response = await fetch(`${BASE_BACKEND_URL}/api/groups/create`, {
                 method: 'POST',
                 credentials: 'include',
@@ -138,31 +150,35 @@ const CreateGroup: React.FC = () => {
             if (!response.ok) {
                 const data = await response.json();
                 throw new Error(data.message || 'Failed to create group');
+            } else {
+                return response;
             }
-
-            navigate('/groups');
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to create group');
-        } finally {
-            setLoading(false);
+        }
+    }
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError(null);
+
+        if (!validateForm()) {
+            return;
+        }
+
+        setLoading(true);
+        try {
+
+            await createGroupInContract();
+
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to create group');
         }
     };
 
-    const calculateEndDate = (frequency: string) => {
-        const date = new Date();
-        switch (frequency) {
-            case 'daily':
-                date.setDate(date.getDate() + 1);
-                break;
-            case 'weekly':
-                date.setDate(date.getDate() + 7);
-                break;
-            case 'monthly':
-                date.setMonth(date.getMonth() + 1);
-                break;
-        }
-        return date;
-    };
+    if (writeContractError) {
+        setError(writeContractError.message)
+    }
 
     return (
         <div className="min-h-screen bg-gray-100 p-4">
