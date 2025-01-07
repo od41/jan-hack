@@ -30,8 +30,7 @@ app.use(cors({
   origin: process.env.FRONTEND_URL || "http://localhost:5173",
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['set-cookie']
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -51,7 +50,6 @@ app.use(session({
     sameSite: 'none',
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
     httpOnly: true,
-    domain: process.env.NODE_ENV === 'production' ? process.env.ROOT_DOMAIN : undefined
   }
 }));
 

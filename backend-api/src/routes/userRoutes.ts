@@ -22,6 +22,9 @@ router.post('/verify', async (req: AuthRequest, res: any) => {
     if (siwe.success) {
       req.session.siwe = { data: siwe.data };
       await req.session.save();
+      console.log("session", req.session)
+      console.log("siwe", req.session.siwe)
+      console.log("cookies", req.cookies)
       const walletAddress = siwe.data.address;
       const chainId = siwe.data.chainId;
       // Find or create user
