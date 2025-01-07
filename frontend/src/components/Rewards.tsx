@@ -1,142 +1,150 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
-interface Location {
-  latitude: number;
-  longitude: number;
-  timestamp: number;
+interface ActivitySession {
+  id: string;
+  distance: number;
+  duration: number;
+  steps: number;
+  date: string;
+  yield: number;
 }
 
 export const Rewards: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
   const navigate = useNavigate();
-  const [isTracking, setIsTracking] = useState(false);
-  const [error, setError] = useState<string>('');
-  const [activity, setActivity] = useState({
-    distance: 0,
-    duration: 0,
-    steps: 0
+  const [activitySessions, setActivitySessions] = useState<ActivitySession[]>([]);
+  const [totalStats, setTotalStats] = useState({
+    totalDistance: 0,
+    totalDuration: 0,
+    totalSteps: 0,
+    totalYield: 0,
   });
-  const [locations, setLocations] = useState<Location[]>([]);
 
   useEffect(() => {
-    if (isTracking) {
-      if (!navigator.geolocation) {
-        setError('Geolocation is not supported by your browser');
-        return;
-      }
-
-      const watchId = navigator.geolocation.watchPosition(
-        (position) => {
-          const newLocation = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            timestamp: position.timestamp
-          };
-
-          setLocations(prev => [...prev, newLocation]);
-          updateActivity(newLocation);
-        },
-        (error) => {
-          setError('Unable to get your location');
-          console.error(error);
+    // TODO: Replace with actual API call
+    const fetchActivitySessions = async () => {
+      // Mock data for now
+      const mockSessions: ActivitySession[] = [
+        {
+          id: '1',
+          distance: 5200,
+          duration: 1800,
+          steps: 6760,
+          date: '2024-03-20',
+          yield: 52,
         },
         {
-          enableHighAccuracy: true,
-          timeout: 5000,
-          maximumAge: 0
-        }
-      );
+          id: '2',
+          distance: 3100,
+          duration: 1200,
+          steps: 4030,
+          date: '2024-03-19',
+          yield: 31,
+        },
+      ];
 
-      return () => navigator.geolocation.clearWatch(watchId);
-    }
-  }, [isTracking]);
+      setActivitySessions(mockSessions);
+      calculateTotalStats(mockSessions);
+    };
 
-  const updateActivity = (newLocation: Location) => {
-    setActivity(prev => {
-      // Calculate new distance and duration
-      const distance = prev.distance + calculateDistance(locations[locations.length - 1], newLocation);
-      const duration = (newLocation.timestamp - locations[0]?.timestamp) / 1000 || 0;
-      const steps = Math.floor(distance * 1300); // Rough estimation of steps
+    fetchActivitySessions();
+  }, []);
 
-      return {
-        distance,
-        duration,
-        steps
-      };
-    });
+  const calculateTotalStats = (sessions: ActivitySession[]) => {
+    const totals = sessions.reduce(
+      (acc, session) => ({
+        totalDistance: acc.totalDistance + session.distance,
+        totalDuration: acc.totalDuration + session.duration,
+        totalSteps: acc.totalSteps + session.steps,
+        totalYield: acc.totalYield + session.yield,
+      }),
+      { totalDistance: 0, totalDuration: 0, totalSteps: 0, totalYield: 0 }
+    );
+    setTotalStats(totals);
   };
 
-  const calculateDistance = (loc1?: Location, loc2?: Location): number => {
-    if (!loc1 || !loc2) return 0;
-    // Haversine formula implementation
-    const R = 6371e3; // Earth's radius in meters
-    const φ1 = loc1.latitude * Math.PI / 180;
-    const φ2 = loc2.latitude * Math.PI / 180;
-    const Δφ = (loc2.latitude - loc1.latitude) * Math.PI / 180;
-    const Δλ = (loc2.longitude - loc1.longitude) * Math.PI / 180;
-
-    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-      Math.cos(φ1) * Math.cos(φ2) *
-      Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-    return R * c;
-  };
-
-  const handleFinish = () => {
-    setIsTracking(false);
-    // Save activity data
-    navigate(`/performance/${groupId}`);
+  const formatDuration = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    return `${hours}h ${remainingMinutes}m`;
   };
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
-      <div className="bg-white rounded-xl p-6 shadow-md">
-        {error ? (
-          <div className="text-red-500 text-center p-4">
-            {error}
-          </div>
-        ) : (
-          <>
-            <div className="space-y-6">
-              <div className="text-center">
-                <h2 className="text-2xl font-bold">
-                  {isTracking ? 'Running...' : 'Ready to Run?'}
-                </h2>
-              </div>
-
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <p className="text-gray-600">Distance</p>
-                  <p className="text-xl font-bold">
-                    {(activity.distance / 1000).toFixed(2)} km
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-600">Duration</p>
-                  <p className="text-xl font-bold">
-                    {Math.floor(activity.duration / 60)}:{(activity.duration % 60).toString().padStart(2, '0')}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-600">Steps</p>
-                  <p className="text-xl font-bold">{activity.steps}</p>
-                </div>
-              </div>
-
-              <button
-                onClick={() => isTracking ? handleFinish() : setIsTracking(true)}
-                className={`w-full py-3 rounded-full font-semibold ${isTracking
-                    ? 'bg-red-500 text-white'
-                    : 'bg-purple-600 text-white'
-                  }`}
-              >
-                {isTracking ? 'Finish Activity' : 'Start Running'}
-              </button>
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Summary Card */}
+        <div className="bg-white rounded-xl p-6 shadow-md">
+          <h2 className="text-2xl font-bold mb-6 text-center">Your Rewards Summary</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div className="bg-purple-50 p-4 rounded-lg">
+              <p className="text-gray-600">Total Distance</p>
+              <p className="text-xl font-bold text-purple-600">
+                {(totalStats.totalDistance / 1000).toFixed(2)} km
+              </p>
             </div>
-          </>
-        )}
+            <div className="bg-purple-50 p-4 rounded-lg">
+              <p className="text-gray-600">Total Duration</p>
+              <p className="text-xl font-bold text-purple-600">
+                {formatDuration(totalStats.totalDuration)}
+              </p>
+            </div>
+            <div className="bg-purple-50 p-4 rounded-lg">
+              <p className="text-gray-600">Total Steps</p>
+              <p className="text-xl font-bold text-purple-600">
+                {totalStats.totalSteps.toLocaleString()}
+              </p>
+            </div>
+            <div className="bg-purple-50 p-4 rounded-lg">
+              <p className="text-gray-600">Total Yield</p>
+              <p className="text-xl font-bold text-purple-600">
+                {totalStats.totalYield} F$
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Activity History */}
+        <div className="bg-white rounded-xl p-6 shadow-md">
+          <h3 className="text-xl font-semibold mb-4">Activity History</h3>
+          <div className="space-y-4">
+            {activitySessions.map((session) => (
+              <div
+                key={session.id}
+                className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50"
+              >
+                <div className="flex justify-between items-center">
+                  <div className="space-y-1">
+                    <p className="text-gray-600">{new Date(session.date).toLocaleDateString()}</p>
+                    <div className="flex space-x-4">
+                      <span className="text-sm text-gray-500">
+                        {(session.distance / 1000).toFixed(2)} km
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        {formatDuration(session.duration)}
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        {session.steps.toLocaleString()} steps
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-gray-600">Yield</p>
+                    <p className="font-semibold text-purple-600">{session.yield} F$</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <button
+          onClick={() => navigate(`/activity/${groupId}`)}
+          className="w-full bg-purple-600 text-white py-3 rounded-full font-semibold hover:bg-purple-700"
+        >
+          Start New Activity
+        </button>
       </div>
     </div>
   );

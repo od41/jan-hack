@@ -22,12 +22,11 @@ export const Footer: React.FC = () => {
 
 const GroupsIcon = () => {
     return (<svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" fill="none">
-        <circle cx="9" cy="6" r="4" stroke="#1C274C" stroke-width="1.5" />
-        <path d="M15 9C16.6569 9 18 7.65685 18 6C18 4.34315 16.6569 3 15 3" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" />
-        <path d="M5.88915 20.5843C6.82627 20.8504 7.88256 21 9 21C12.866 21 16 19.2091 16 17C16 14.7909 12.866 13 9 13C5.13401 13 2 14.7909 2 17C2 17.3453 2.07657 17.6804 2.22053 18" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" />
-        <path d="M18 14C19.7542 14.3847 21 15.3589 21 16.5C21 17.5293 19.9863 18.4229 18.5 18.8704" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" />
-    </svg>
-    )
+        <circle cx="9" cy="6" r="4" stroke="#1C274C" strokeWidth="1.5" />
+        <path d="M15 9C16.6569 9 18 7.65685 18 6C18 4.34315 16.6569 3 15 3" stroke="#1C274C" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M5.88915 20.5843C6.82627 20.8504 7.88256 21 9 21C12.866 21 16 19.2091 16 17C16 14.7909 12.866 13 9 13C5.13401 13 2 14.7909 2 17C2 17.3453 2.07657 17.6804 2.22053 18" stroke="#1C274C" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M18 14C19.7542 14.3847 21 15.3589 21 16.5C21 17.5293 19.9863 18.4229 18.5 18.8704" stroke="#1C274C" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>)
 }
 
 const RewardsIcon = () => {
@@ -50,7 +49,7 @@ const RewardsIcon = () => {
 
 const DiscoverIcon = () => {
     return (<svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" fill="none">
-        <path d="M17.8 2.1L7.86997 4.59C6.41997 4.95 4.94997 6.42 4.58997 7.87L2.09997 17.8C1.34997 20.8 3.18997 22.65 6.19997 21.9L16.13 19.42C17.57 19.06 19.05 17.58 19.41 16.14L21.9 6.2C22.65 3.2 20.8 1.35 17.8 2.1Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-        <path d="M12 15.5C13.933 15.5 15.5 13.933 15.5 12C15.5 10.067 13.933 8.5 12 8.5C10.067 8.5 8.5 10.067 8.5 12C8.5 13.933 10.067 15.5 12 15.5Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M17.8 2.1L7.86997 4.59C6.41997 4.95 4.94997 6.42 4.58997 7.87L2.09997 17.8C1.34997 20.8 3.18997 22.65 6.19997 21.9L16.13 19.42C17.57 19.06 19.05 17.58 19.41 16.14L21.9 6.2C22.65 3.2 20.8 1.35 17.8 2.1Z" stroke="#292D32" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M12 15.5C13.933 15.5 15.5 13.933 15.5 12C15.5 10.067 13.933 8.5 12 8.5C10.067 8.5 8.5 10.067 8.5 12C8.5 13.933 10.067 15.5 12 15.5Z" stroke="#292D32" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>)
 }

@@ -54,11 +54,11 @@ app.use(session({
 }));
 
 // Add before routes
-app.use((req, res, next) => {
-  console.log('Session:', req.session);
-  console.log('Cookies:', req.cookies);
-  next();
-});
+// app.use((req, res, next) => {
+//   console.log('Session:', req.session);
+//   console.log('Cookies:', req.cookies);
+//   next();
+// });
 
 // Public routes
 app.use('/api/users', userRoutes);

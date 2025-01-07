@@ -4,8 +4,7 @@ import { Group } from '../types';
 import { BASE_BACKEND_URL } from '../contexts/AppProvider';
 import { getFitFiContract, getTokenContract, publicClient } from '../contracts';
 import { useContractRead, useWriteContract, useWaitForTransactionReceipt, useAccount } from 'wagmi';
-import { decodeEventLog, erc20Abi, parseEther, parseEventLogs } from 'viem';
-import { FitFiEvents } from '../contracts/FitFi';
+import { erc20Abi, parseEther, parseEventLogs } from 'viem';
 
 const JoinGroup: React.FC = () => {
     const { groupId } = useParams<{ groupId: string }>();
