@@ -32,16 +32,10 @@ router.post('/verify', async (req: AuthRequest, res: any) => {
           username: walletAddress
         });
       }
-      // Generate JWT
-      const token = jwt.sign(
-        { wallet_address: user.wallet_address },
-        process.env.JWT_SECRET!,
-        { expiresIn: '24h' }
-      );
 
-      return res.status(200).json({ user, token, ok: true, address: walletAddress, chainId });
+      return res.status(200).json({ ok: true, address: walletAddress, chainId });
     } else {
-      return res.send(false);
+      return res.send({ok: false});
     }
   } catch {
     return res.send(false);
