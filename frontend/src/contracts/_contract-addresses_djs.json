@@ -1,0 +1,20 @@
+{
+    "localhost": {
+        "FitFi": "0x...",
+        "MockERC20": "0x...",
+        "MockYieldProtocol": "0x...",
+        "MockActivityValidator": "0x..."
+    },
+    "lensTestnet": {
+        "FitFi": "0xFfCd57C1cCA0B6b5421fEdE16AA8Be44bf7b2CfD",
+        "MockERC20": "0x53939e80a14468680E2e85db2bE31bF4570C8dd9",
+        "MockYieldProtocol": "0x3219356Ac6184D94fb052460d976F0Eab1009813",
+        "MockActivityValidator": "0xF36016Cc5c9222803fCcE94668B3Eb333bD6858a"
+    },
+    "zkSyncTestnet": {
+        "FitFi": "0x...",
+        "MockERC20": "0x...",
+        "MockYieldProtocol": "0x...",
+        "MockActivityValidator": "0x..."
+    }
+}

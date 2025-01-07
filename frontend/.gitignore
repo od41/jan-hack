@@ -28,4 +28,4 @@ dist-ssr
 .env.local
 
 # Contract artifacts
-src/contracts
+# src/contracts
