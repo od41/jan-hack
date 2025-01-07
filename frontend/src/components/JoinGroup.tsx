@@ -114,6 +114,7 @@ const JoinGroup: React.FC = () => {
             console.log(logs)
             if (logs.length) {
                 const depositRes = await depositTokenInContract();
+                console.log('depositRes', depositRes)
             }
 
         }
