@@ -33,3 +33,8 @@ ActivityValidator: 0x349Af72509549ad838E43F6F492Cd6dC91eEfd1a
 Key technologies:
 - Lens Testnet
 - Family ConnectKit for user accounts
+
+## Technical Architecture
+![FitFi Technical Architecture](./fitfi-architecture-diagram.png)
+
+### License: [MIT](./LICENSE)
