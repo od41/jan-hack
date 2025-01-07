@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import protect from './middleware/authMiddleware';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
+import cookieParser from 'cookie-parser';
 
 // Import routes
 import userRoutes from './routes/userRoutes';
@@ -24,6 +25,7 @@ if (!MONGODB_URI) {
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(cors({
   origin: process.env.FRONTEND_URL || "http://localhost:5173",
   credentials: true,
