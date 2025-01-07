@@ -22,7 +22,7 @@ const CreateGroup: React.FC = () => {
     const [form, setForm] = useState<CreateGroupForm>({
         name: '',
         description: '',
-        minStake: '0.1',
+        minStake: '10',
         minDistance: 100,
         maxMembers: 10,
         frequency: 'daily'
@@ -55,6 +55,7 @@ const CreateGroup: React.FC = () => {
     };
 
     useEffect(() => {
+        if (!hash) return;
         const verifyTransaction = async () => {
             // Wait for transaction to be mined
             const receipt = await publicClient.getTransactionReceipt({ hash });
@@ -213,7 +214,7 @@ const CreateGroup: React.FC = () => {
 
                 <div className='w-full flex justify-between items-center gap-4'>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">Min. Stake (GRASS)</label>
+                        <label className="block text-sm font-medium text-gray-700">Min. Stake (F$)</label>
                         <input
                             type="number"
                             step="0.01"
